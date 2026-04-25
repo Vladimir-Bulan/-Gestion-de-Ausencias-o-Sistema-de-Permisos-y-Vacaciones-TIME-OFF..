@@ -1,0 +1,147 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateEmployeeInput {
+  email: String!
+  managerId: String
+  name: String!
+  role: Role! = EMPLOYEE
+}
+
+input CreateTimeOffRequestInput {
+  employeeId: ID!
+  endDate: String!
+  reason: String
+  startDate: String!
+  type: LeaveType!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Employee {
+  createdAt: DateTime!
+  email: String!
+  id: ID!
+  managerId: ID
+  name: String!
+
+  """Direct reports of this employee"""
+  reports: [Employee!]
+  role: Role!
+  updatedAt: DateTime!
+}
+
+input FilterRequestsInput {
+  employeeId: ID
+  status: String
+  type: LeaveType
+}
+
+type LeaveBalance {
+  createdAt: DateTime!
+  employeeId: ID!
+  id: ID!
+  personalDays: Int!
+  sickDays: Int!
+  updatedAt: DateTime!
+  vacationDays: Int!
+  year: Int!
+}
+
+"""Type of leave being requested"""
+enum LeaveType {
+  PERSONAL
+  SICK
+  UNPAID
+  VACATION
+}
+
+type Mutation {
+  """Cancel a time off request"""
+  cancelTimeOffRequest(employeeId: ID!, requestId: ID!): TimeOffRequest!
+
+  """Create a new employee"""
+  createEmployee(input: CreateEmployeeInput!): Employee!
+
+  """Submit a new time off request"""
+  createTimeOffRequest(input: CreateTimeOffRequestInput!): TimeOffRequest!
+
+  """Delete an employee"""
+  removeEmployee(id: ID!): Employee!
+
+  """Approve or reject a time off request (managers only)"""
+  reviewTimeOffRequest(input: ReviewRequestInput!): TimeOffRequest!
+
+  """Update an existing employee"""
+  updateEmployee(input: UpdateEmployeeInput!): Employee!
+}
+
+type Query {
+  """Get a single employee by ID"""
+  employee(id: ID!): Employee!
+
+  """Get all requests for a specific employee"""
+  employeeTimeOffRequests(employeeId: ID!): [TimeOffRequest!]!
+
+  """Get all employees"""
+  employees: [Employee!]!
+
+  """Get an employee's leave balance"""
+  leaveBalance(employeeId: ID!): LeaveBalance!
+
+  """Get a single time off request by ID"""
+  timeOffRequest(id: ID!): TimeOffRequest!
+
+  """Get all time off requests with optional filters"""
+  timeOffRequests(filters: FilterRequestsInput): [TimeOffRequest!]!
+}
+
+"""Current status of a time off request"""
+enum RequestStatus {
+  APPROVED
+  CANCELLED
+  PENDING
+  REJECTED
+}
+
+input ReviewRequestInput {
+  decision: String!
+  requestId: ID!
+  reviewNote: String
+  reviewedById: ID!
+}
+
+"""Employee role within the organization"""
+enum Role {
+  ADMIN
+  EMPLOYEE
+  MANAGER
+}
+
+type TimeOffRequest {
+  createdAt: DateTime!
+  employee: Employee
+  employeeId: ID!
+  endDate: DateTime!
+  id: ID!
+  reason: String
+  reviewNote: String
+  reviewedById: ID
+  startDate: DateTime!
+  status: RequestStatus!
+  totalDays: Int!
+  type: LeaveType!
+  updatedAt: DateTime!
+}
+
+input UpdateEmployeeInput {
+  email: String
+  id: String!
+  managerId: String
+  name: String
+  role: Role = EMPLOYEE
+}

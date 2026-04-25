@@ -1,0 +1,82 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id         String    @id @default(uuid())
+  name       String
+  email      String    @unique
+  role       Role      @default(EMPLOYEE)
+  managerId  String?
+  manager    Employee? @relation("ManagerToEmployee", fields: [managerId], references: [id])
+  reports    Employee[] @relation("ManagerToEmployee")
+
+  requests   TimeOffRequest[]
+  balance    LeaveBalance?
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("employees")
+}
+
+model TimeOffRequest {
+  id           String        @id @default(uuid())
+  employeeId   String
+  employee     Employee      @relation(fields: [employeeId], references: [id])
+  type         LeaveType
+  startDate    DateTime
+  endDate      DateTime
+  totalDays    Int
+  reason       String?
+  status       RequestStatus @default(PENDING)
+  reviewedById String?
+  reviewNote   String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("time_off_requests")
+}
+
+model LeaveBalance {
+  id              String   @id @default(uuid())
+  employeeId      String   @unique
+  employee        Employee @relation(fields: [employeeId], references: [id])
+  vacationDays    Int      @default(15)
+  sickDays        Int      @default(10)
+  personalDays    Int      @default(5)
+  year            Int
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("leave_balances")
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  ADMIN
+}
+
+enum LeaveType {
+  VACATION
+  SICK
+  PERSONAL
+  UNPAID
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
