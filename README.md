@@ -1,10 +1,30 @@
 # Wizdaa Time Off Management
 
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
+![GraphQL](https://img.shields.io/badge/GraphQL-E10098?style=for-the-badge&logo=graphql&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
+
 A fullstack **Time Off Management** application built with **NestJS**, **GraphQL**, **PostgreSQL**, **Prisma**, **React**, and **TypeScript**. Employees can submit leave requests, managers can approve or reject them, and balances are tracked automatically.
+
+## Screenshots
+
+> Dashboard · Employees · Requests
+
+![Dashboard](./docs/screenshots/dashboard.png)
+![Employees](./docs/screenshots/employees.png)
+![Requests](./docs/screenshots/requests.png)
+
+## Live Demo
+- Backend GraphQL Playground: `http://localhost:3000/graphql`
+- Frontend: `http://localhost:5173`
 
 ## Architecture
 
-```
+\`\`\`
 wizdaa-time-off/                 (monorepo root)
 ├── src/                         Backend (NestJS + GraphQL + Prisma)
 │   ├── common/
@@ -23,7 +43,7 @@ wizdaa-time-off/                 (monorepo root)
 │   └── package.json
 ├── package.json                 Backend dependencies & scripts
 └── docker-compose.yml           PostgreSQL container
-```
+\`\`\`
 
 **Design decisions:**
 
@@ -47,14 +67,13 @@ wizdaa-time-off/                 (monorepo root)
 ## Prerequisites
 
 - Node.js 18+
-- Docker & Docker Compose (for PostgreSQL)
 - npm
 
 ## Setup
 
 ### Backend
 
-```bash
+\`\`\`bash
 # Install dependencies
 npm install
 
@@ -72,102 +91,70 @@ npx prisma db seed
 
 # Start development server (with hot reload)
 npm run start:dev
-```
+\`\`\`
 
 The backend runs at **http://localhost:3000**
 GraphQL Playground: **http://localhost:3000/graphql**
 
 ### Frontend
 
-```bash
+\`\`\`bash
 cd frontend
 npm install
 npm run dev
-```
+\`\`\`
+
+Frontend runs at **http://localhost:5173**
 
 ## Running Tests
 
-```bash
+\`\`\`bash
 # Run all tests
 npm test
 
 # Run tests with coverage report
 npm run test:cov
-```
+\`\`\`
 
 ## GraphQL API Reference
 
 ### Queries
 
-```graphql
+\`\`\`graphql
 # Get all employees
 query {
   employees {
-    id
-    name
-    email
-    role
-    managerId
+    id name email role managerId
   }
 }
 
 # Get a single employee with their direct reports
 query {
   employee(id: "uuid") {
-    id
-    name
-    email
-    role
-    reports {
-      id
-      name
-    }
+    id name email role
+    reports { id name }
   }
 }
 
 # Get all time off requests (with optional filters)
 query {
   timeOffRequests(filters: { status: "PENDING" }) {
-    id
-    type
-    startDate
-    endDate
-    totalDays
-    status
-    reason
-    employee {
-      name
-      email
-    }
-  }
-}
-
-# Get requests for a specific employee
-query {
-  employeeTimeOffRequests(employeeId: "uuid") {
-    id
-    type
-    status
-    startDate
-    endDate
-    totalDays
+    id type startDate endDate totalDays status reason
+    employee { name email }
   }
 }
 
 # Get leave balance for an employee
 query {
   leaveBalance(employeeId: "uuid") {
-    vacationDays
-    sickDays
-    personalDays
-    year
+    vacationDays sickDays personalDays year
   }
 }
-```
+\`\`\`
 
 ### Mutations
 
-```graphql
+\`\`\`graphql
 # Create a new employee
 mutation {
   createEmployee(input: {
@@ -175,11 +162,7 @@ mutation {
     email: "alice@wizdaa.com"
     role: EMPLOYEE
     managerId: "manager-uuid"
-  }) {
-    id
-    name
-    email
-  }
+  }) { id name email }
 }
 
 # Submit a time off request
@@ -190,11 +173,7 @@ mutation {
     startDate: "2025-07-01"
     endDate: "2025-07-05"
     reason: "Summer vacation"
-  }) {
-    id
-    status
-    totalDays
-  }
+  }) { id status totalDays }
 }
 
 # Approve or reject a request (managers/admins only)
@@ -204,11 +183,7 @@ mutation {
     reviewedById: "manager-uuid"
     decision: "APPROVE"
     reviewNote: "Approved, enjoy your time off!"
-  }) {
-    id
-    status
-    reviewNote
-  }
+  }) { id status reviewNote }
 }
 
 # Cancel a request (restores balance if previously approved)
@@ -216,12 +191,9 @@ mutation {
   cancelTimeOffRequest(
     requestId: "request-uuid"
     employeeId: "employee-uuid"
-  ) {
-    id
-    status
-  }
+  ) { id status }
 }
-```
+\`\`\`
 
 ## Business Rules
 
